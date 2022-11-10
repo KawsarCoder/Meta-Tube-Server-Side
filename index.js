@@ -70,12 +70,7 @@ async function run() {
 
     // reviews api
 
-    app.get("/reviews", verifyJWT, async (req, res) => {
-      const decoded = req.decoded;
-      if (decoded.email !== req.query.email) {
-        res.status(403).send({ message: "Forbidden access" });
-      }
-
+    app.get("/reviews", async (req, res) => {
       let query = {};
       if (req.query.email) {
         query = {
@@ -87,7 +82,7 @@ async function run() {
       res.send(reviews);
     });
 
-    app.post("/reviews", async (req, res) => {
+    app.post("/reviews", verifyJWT, async (req, res) => {
       const review = req.body;
       const result = await reviewsCollection.insertOne(review);
       res.send(result);
@@ -100,7 +95,7 @@ async function run() {
       res.send(review);
     });
 
-    app.put("/reviews/:id", async (req, res) => {
+    app.put("/reviews/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) };
       const review = req.body;
@@ -118,7 +113,7 @@ async function run() {
       res.send(result);
     });
 
-    app.delete("/reviews/:id", async (req, res) => {
+    app.delete("/reviews/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
       const result = await reviewsCollection.deleteOne(query);
